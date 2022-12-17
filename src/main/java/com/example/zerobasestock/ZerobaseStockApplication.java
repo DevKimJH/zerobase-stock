@@ -1,19 +1,9 @@
 package com.example.zerobasestock;
 
-import com.example.zerobasestock.model.Company;
-import com.example.zerobasestock.model.ScrapedResult;
-import com.example.zerobasestock.scraper.NaverFinanceScraper;
-import com.example.zerobasestock.scraper.Scraper;
-import com.example.zerobasestock.scraper.YahooFinanceScraper;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.commons.collections4.Trie;
+import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.IOException;
 
 @SpringBootApplication
 public class ZerobaseStockApplication {
@@ -28,5 +18,10 @@ public class ZerobaseStockApplication {
         //ScrapedResult result = scraper.scrap(Company.builder().ticker("O").build());
         //Company result = scraper.scrapCompanyByTicker("MMM");
         //System.out.println(result);
+
+
     }
+
 }
+
+
