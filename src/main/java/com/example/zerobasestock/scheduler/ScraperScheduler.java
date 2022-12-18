@@ -2,6 +2,7 @@ package com.example.zerobasestock.scheduler;
 
 import com.example.zerobasestock.model.Company;
 import com.example.zerobasestock.model.ScrapedResult;
+import com.example.zerobasestock.model.constants.CacheKey;
 import com.example.zerobasestock.persist.CompanyRepository;
 import com.example.zerobasestock.persist.DividendRepository;
 import com.example.zerobasestock.persist.entity.CompanyEntity;
@@ -9,6 +10,8 @@ import com.example.zerobasestock.persist.entity.DividendEntity;
 import com.example.zerobasestock.scraper.Scraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +21,7 @@ import java.util.List;
 @Slf4j
 @Component
 @AllArgsConstructor
+@EnableCaching
 public class ScraperScheduler {
 
     private final CompanyRepository companyRepository;
@@ -26,6 +30,7 @@ public class ScraperScheduler {
     private final Scraper yahooFinanceScraper;
 
 
+    /*
     @Scheduled(fixedDelay = 1000)
     public void test1() throws InterruptedException{
         Thread.sleep(10000);
@@ -35,10 +40,11 @@ public class ScraperScheduler {
     @Scheduled(fixedDelay = 1000)
     public void test2(){
         System.out.println("테스트 2 : " + LocalDateTime.now());
-    }
+    }*/
 
     // 일정 주기마다 수행
-    //@Scheduled(cron = "${scheduler.scrap.yahoo}")
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling(){
 
         log.info("scraping scheduler is started");
@@ -51,10 +57,7 @@ public class ScraperScheduler {
 
             log.info("scraping scheduler is started -> " + company.getName());
 
-            ScrapedResult scrapedResult = yahooFinanceScraper.scrap(Company.builder()
-                                                .name(company.getName())
-                                                .ticker(company.getTicker())
-                                                .build());
+            ScrapedResult scrapedResult = yahooFinanceScraper.scrap(new Company(company.getTicker(), company.getName()));
 
             // 스크래핑한 배당금 정보 중 데이터베이스에 없는 값은 저장
             scrapedResult.getDividends().stream()
